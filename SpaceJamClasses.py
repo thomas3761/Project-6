@@ -58,11 +58,16 @@ class Spaceship(SphereCollideObject):# / player
         self.modelNode.setTexture(tex, 1)
         #self.modelNode.setP(100)
 
+        self.missileBay = 10
+        self.missileDistance = 100
+
+        self.setKeyBindings()
+
 # new 
         self.cutExplode = 0
         self.ExplodeIntervals ={}
         self.traverser = traverser
-        self.handler = CollisionHandlerEvent
+        self.handler = CollisionHandlerEvent()
         self.handler.addInPattern('into')
         self.accept('into', self.HandleInto)
 #
@@ -156,28 +161,28 @@ class Spaceship(SphereCollideObject):# / player
 
     
     def Fire(self):
-        if self.missileBay:
+        if self.missileBay > 0:
             travRate = self.missileDistance
             aim = self.render.getRelativePoint(self.modelNode, Vec3.forward())
             aim.normalize()
             fireSolution = aim * travRate
-            inFront =aim * 150
+            inFront = aim * 150
             travVec = fireSolution + self.modelNode.getPos()
             self.missileBay -= 1
             tag = 'Missile' + str(Missile.missileCount)
             posVec = self.modelNode.getPos() + inFront
-            currentMissile = Missile(self.loader, './Assets/Phaser/Phaser.egg', self.render, tag, posVec, 4.0)
-            Missile.Intervals[tag] = currentMissile.modelNode.posInterval(2.0, travVec, startPos = posVec, fuid = 1)
-            Missile.Intervals[tag].staret()
+            currentMissile = Missile(self.loader, './Assets/Phaser/phaser.egg', self.render, tag, posVec, 4.0)
+            Missile.Intervals[tag] = currentMissile.modelNode.posInterval(2.0, travVec, startPos=posVec, fluid=1) 
+            Missile.Intervals[tag].start()
 # new
             self.traverser.addCollider(currentMissile.collisionNode,self.handler)
 
         else:
-            if not self.taskManager.hasTaskNamd('reloaad'):
+            if not self.taskManager.hasTaskNamed('reload'):
                 print('Initializing reload...')
                 self.taskManager.doMethodLater(0,self.Reload, 'reload')
                 return Task.cont
-            
+                   
     def Reload(self, task):
         if task.time > self.reloadTime:
             self.missileBay += 1
@@ -228,14 +233,15 @@ class Spaceship(SphereCollideObject):# / player
             del Missile.cNodes[i]
             del Missile.collisionSolids[i]
 
-            print(1 + 'has reached the end of it fire solution.')
+            print(i + 'has reached the end of it fire solution.')
             break
             return Task.cont
         
     def EnableHud(self):
-        self.Hud = OnscreenImage(image = "./Assets/Hud/Reticle3b.png", pos = Vec3 (0,0,0), scale = 0.1)
-        self.hud.setTransparency(TransparencyAttrib.MAlpha)
-        self.EnableHUd()
+        print("EnableHud method called")  # Add this line
+        self.Hud = OnscreenImage(image="./Assets/Hud/Reticle3b.png", pos=Vec3(0, 0, 0), scale=0.1)
+        self.Hud.setTransparency(TransparencyAttrib.MAlpha)
+        self.EnableHud()
 
 # new s
     def HandleInto(self, entry):
@@ -263,7 +269,7 @@ class Spaceship(SphereCollideObject):# / player
         else:
             Missile.Intervals[shooter.finish]
 #
-      
+              
 class SpaceStation(CollisionCapsuleObject):
     def __init__(self, loader: Loader, render: NodePath, modelPath: str, parentNode: NodePath, nodeName: str, texPath: str, posVec: Vec3, scaleVec: float, radius: float):
         super(SpaceStation, self).__init__(loader, modelPath, parentNode, nodeName,1, -1, 5, 1, -1, -5, 0)
@@ -286,8 +292,8 @@ class Missile(SphereCollideObject):
     missileCount = 0
 
     def __init__(self, loader: Loader, modelPath: str, parentNode: NodePath, nodeName: str, posVec: Vec3, scaleVec: float = 1):
-        super(Missile, self).__init__(Loader, modelPath, parentNode, nodeName, Vec3(0, 0, 0), 3.0)
-        
+        super(Missile, self).__init__(loader, modelPath, parentNode, nodeName, Vec3(0, 0, 0), 3.0)
+  
         self.modelNode.setScale(scaleVec)
         self.modelNode.setPos(posVec)
         self.modelNode.setName(nodeName)
@@ -296,15 +302,14 @@ class Missile(SphereCollideObject):
 
         Missile.fireModels[nodeName] = self.modelNode
         Missile.cNodes[nodeName]=self.collisionNode
-        Missile.collisionSolids[nodeName] = self.collisionNode.node().getsolid(0)
+        Missile.collisionSolids[nodeName] = self.collisionNode.node().getSolid(0)
         Missile.cNodes[nodeName].show()
 
         print("Fire torpedo #" + str(Missile.missileCount))
 
 class DroneShowBase(SphereCollideObject):
-    def DrawCloudDefense(self, loader: Loader, render: NodePath, modelPath: str, parentNode: NodePath, nodeName: str, texPath: str, posVec: Vec3, scaleVec: float,centralObject, droneName, position):
-        super(DroneShowBase, self).__init__(loader, modelPath, parentNode, nodeName, Vec3 (0,0,0), 1.2)
-
+    def __init__(self, loader: Loader, render: NodePath, modelPath: str, parentNode: NodePath, nodeName: str, texPath: str, posVec: Vec3, scaleVec: float):
+        super(DroneShowBase, self).__init__(loader, modelPath, parentNode, nodeName, posVec, scaleVec)  
 
         self.modelNode.setPos(posVec)
         self.modelNode.setScale(scaleVec)
@@ -314,15 +319,6 @@ class DroneShowBase(SphereCollideObject):
         
         self.loader = loader
         self.render = render
-
-        """"
-        placeholder = self.render.attachNewNode('placeholder')
-        placeholder.setPos(position)
-
-        drone_model = self.loader.loadModel("Assets/DroneDefender/DroneDefender.obj")
-        drone_model.reparentTo(placeholder)
-        drone_model.setScale(3)
-"""
 
 # new
     def DroneDestroy(self, hitId, hitPosition):

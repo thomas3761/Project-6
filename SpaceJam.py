@@ -18,11 +18,13 @@ class SpaceJam(ShowBase):
         self.planet5 = spaceJamClasses.Planet(self.loader, self.render, "./Assets/Planets/protoPlanet.x", self.render, "Planet5", "./Assets/Planets/Planet 5.jpg", Vec3(1382, 1274, 4567), 350)
         self.planet6 = spaceJamClasses.Planet(self.loader, self.render, "./Assets/Planets/protoPlanet.x", self.render, "Planet6", "./Assets/Planets/Planet 6.png", Vec3(4502, 1274, 6478), 350)
 
-        self.Spaceship = spaceJamClasses.Spaceship(self.loader, self.render, "./Assets/Dumbledore/Dumbledore.egg", self.render, "Spaceship", "./Assets/Dumbledore/spacejet_C.png", Vec3(0, 0, 0), 10, self.taskMgr, self.accept)
+        self.Spaceship = spaceJamClasses.Spaceship(self.loader, self.render, "./Assets/Dumbledore/Dumbledore.egg", self.render, "Spaceship", "./Assets/Dumbledore/spacejet_C.png", Vec3(0, 0, 0), 10, self.taskMgr, self.accept, self.cTrav)
 
         self.universe = spaceJamClasses.Universe(self.loader, self.render, "./Assets/Universe/Universe.x", self.render, "Universe", "./Assets/Universe/space-galaxy.jpg", Vec3(0,0,0), 15000) 
 
         self.spaceStation = spaceJamClasses.SpaceStation(self.loader, self.render, "./Assets/SpaceStation1B/spaceStation.x", self.render, "SpaceStation", "./Assets/SpaceStation1B/SpaceStation1_Dif2.png", Vec3(1000, 5000, 80), Vec3(10, 10, 50), 5)
+
+        self.droneshowbase = spaceJamClasses.DroneShowBase(self.loader, self.render, "./Assets/DroneDefender/DroneDefender.obj", self.render, "DroneObject", "./Assets/DroneDefender/octotoad1_auv.png", Vec3(0, 0, 0), 1.0)
 
         self.cTrav = CollisionTraverser()
         self.pusher = CollisionHandlerPusher()
@@ -96,9 +98,9 @@ class SpaceJam(ShowBase):
     def DrawBaseballSeams(self, centralObject, step, numSeams, radius=1): 
         for i in range(numSeams):
             position = defensePaths.BaseballSeams(step, numSeams, B=0.4) * radius
-            self.droneshowbase.DrawCloudDefense(self.loader, self.render, "./Assets/DroneDefender/DroneDefender.obj", self.render, "DroneObject", "./Assets/DroneDefender/drone_texture.png", Vec3(0, 0, 0), 1.0, centralObject, f"Drone_{i}", position)
-
-            
+            SpaceJamClasses.droneShowBase(self.loader, self.render, "./Assets/DroneDefender/DroneDefender.obj", self.render, "DroneObject", "./Assets/DroneDefender/octotoad1_auv.png", Vec3(0, 0, 0), 1.0, centralObject, f"Drone_{i}", position)
+        
+    
     def SetCamera(self):
         self.disableMouse()
         self.camera.reparentTo(self.Spaceship.modelNode)
